@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js 这里使用flask的url_for-->
+    <script src="{{ url_for('static', filename='echarts.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
+</head>
+<body>
+<div id="main" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        myChart.setOption({
+            title: {'蜜罐状态展示'
+            },
+            tooltip: {},
+            legend: {
+                data: ['CPU占用率'],
+            },
+            xAxis: {
+                data: []
+            },
+            yAxis: {},
+            series: [{
+                name: 'CPU占用率',
+                type: 'bar',
+                data: []
+            }]
+
+        });
+        var hosts = [];
+        var cpu = [];
+        myChart.showLoading();
+        $.get('/api/get/usage').done(function (data) {
+            for(var i=0; i<data['data'].length;i++){
+                hosts.push(data['data'][i]['host']);
+                cpu.push(data['data'][i]['cpu']);
+                console.log(hosts);
+            }
+            myChart.hideLoading();
+            myChart.setOption({
+                xAxis: {
+                    data: hosts
+                },
+                series: [{
+                    name: 'CPU占用率',
+                    data: cpu
+
+                }]
+
+            });
+
+        });
+    </script>
+</body>
+</html>
